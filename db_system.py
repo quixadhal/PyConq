@@ -30,18 +30,18 @@ def init_db():
     context = MigrationContext.configure(connection)
     current_revision = context.get_current_revision()
     logger.boot('Database revision: %s', current_revision)
-    if current_revision is None:
-        from option import Option
-        DataBase.metadata.create_all(SQLEngine)
-        session = Session()
-        options = Option()
-        options.date_created = datetime.now()
-        options.version = None
-        #options.port = 4400
-        #options.wizlock = False
-        session.add(options)
-        session.commit()
-        logger.boot('Database created and initialized.')
+    #if current_revision is None:
+    #    from option import Option
+    #    DataBase.metadata.create_all(SQLEngine)
+    #    session = Session()
+    #    options = Option()
+    #    options.date_created = datetime.now()
+    #    options.version = None
+    #    #options.port = 4400
+    #    #options.wizlock = False
+    #    session.add(options)
+    #    session.commit()
+    #    logger.boot('Database created and initialized.')
 
     config = Config(ALEMBIC_CONFIG)
     script = ScriptDirectory.from_config(config)
@@ -52,5 +52,10 @@ def init_db():
         from option import Option
         session = Session()
         options = session.query(Option).first()
+        if options is None:
+            options = Option()
+            options.date_created = datetime.now()
+            session.add(options)
+            logger.boot('Database created and initialized.')
         options.version = head_revision
         session.commit()
